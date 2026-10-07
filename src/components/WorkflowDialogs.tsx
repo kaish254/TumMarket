@@ -11,7 +11,7 @@ function DialogShell({ children, onClose, title, className = '' }: DialogProps &
     <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
       <section className={`post-modal workflow-modal ${className}`} role="dialog" aria-modal="true" aria-labelledby="workflow-title">
         <button className="modal-close" onClick={onClose} aria-label="Close dialog"><X size={19} /></button>
-        <span className="section-kicker">TUMMARKET COMMUNITY</span>
+        <span className="section-kicker">KENYA MARKETPLACE</span>
         <h2 id="workflow-title">{title}</h2>
         {children}
       </section>
@@ -86,13 +86,13 @@ export function AuthDialog({ onClose }: DialogProps) {
   return (
     <DialogShell
       onClose={onClose}
-      title="Your TUM community, closer."
+      title="Your local market, closer."
       className="auth-dialog"
     >
       <p className="post-intro">
         {mode === 'signin'
           ? 'Sign in to buy, sell, save listings and make payments.'
-          : 'Create your TUMMarket account.'}
+          : 'Create your Kenya marketplace account.'}
       </p>
 
       <form className="post-form" onSubmit={submit}>
@@ -192,10 +192,10 @@ export function VerificationDialog({ user, onClose, onSuccess }: DialogProps & {
   };
 
   return (
-    <DialogShell onClose={onClose} title="Request TUM verification" className="verification-dialog">
-      <p className="post-intro">A moderator will review your university email. This request does not automatically verify your account.</p>
+    <DialogShell onClose={onClose} title="Request community verification" className="verification-dialog">
+      <p className="post-intro">A moderator will review your request. Verification is optional and does not limit who can use the marketplace.</p>
       <form className="post-form" onSubmit={submit}>
-        <label>TUM email address<input name="universityEmail" type="email" placeholder="name@tum.ac.ke" required maxLength={254} /></label>
+        <label>Contact email<input name="universityEmail" type="email" placeholder="you@example.com" required maxLength={254} /></label>
         <label>Anything to help review? <span className="optional-label">(optional)</span><textarea name="note" rows={3} maxLength={300} placeholder="Add context, but do not include passwords or financial details." /></label>
         <div className="post-note"><ShieldCheck size={15} /><span>We do not ask for passwords or store student ID images.</span></div>
         {notice && <p className="workflow-notice" role="status">{notice}</p>}

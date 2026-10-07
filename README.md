@@ -1,18 +1,18 @@
 # TumMarket
 
-A TUM-first student marketplace for buying and selling, housing, vacancies, gigs, and services around Mombasa.
+A Kenya-wide marketplace for buying and selling, housing, vacancies, gigs, and services. Anyone in Kenya can create an account and browse or post listings in their town or county.
 
 ## Local setup
 
 1. Install Node.js 20 or newer.
 2. Run `npm install`.
 3. Copy `.env.example` to `.env.local` and fill in the Supabase project URL and publishable/anon key.
-4. Run the SQL migration in `supabase/migrations/202610050001_initial_schema.sql` using the Supabase SQL Editor, or apply it with the Supabase CLI.
+4. Apply the SQL migrations in `supabase/migrations/` using the Supabase SQL Editor or Supabase CLI, in filename order. Existing deployments should apply `202610070001_nationwide_marketplace.sql` to remove the legacy TUM-only profile constraint and `202610070002_publish_listings_immediately.sql` to publish new listings immediately.
 5. In Supabase Authentication, enable email OTP/magic links and add the local and production app URLs to the redirect URL allow list.
 6. Run `npm run dev` and open the local URL printed by Vite.
 7. Run `npm run build` to type-check and build for production.
 
-Without Supabase variables, the app stays in demo mode and uses sample listings. With Supabase configured, it uses real accounts, saved listings, persistent listings, photo uploads, reports, and moderation. New listings are private to their owner and moderators until approved.
+Without Supabase variables, the app stays in demo mode and uses sample listings. With Supabase configured, it uses real accounts, saved listings, persistent listings, photo uploads, reports, and moderation. New listings are published immediately. Moderators can still review reports and remove listings that violate marketplace rules.
 
 ## Initial moderator
 
@@ -24,7 +24,7 @@ set role = 'moderator'
 where id = (select id from auth.users where email = 'YOUR_EMAIL');
 ```
 
-Only moderators can approve listings, review TUM verification requests, and resolve reports. Verification is manual; submitting a university email does not automatically award a verified badge.
+Only moderators can approve listings, review optional community verification requests, and resolve reports. Verification is manual and does not limit who can use the marketplace.
 
 ## Privacy and safety
 

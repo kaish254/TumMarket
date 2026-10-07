@@ -66,7 +66,7 @@ const photo = (id: string, width = 800) => `https://images.unsplash.com/${id}?au
 const seedListings: Listing[] = [
   {
     id: 1,
-    title: 'Sunny bedsitter, 5 min from TUM',
+    title: 'Sunny bedsitter near the coast',
     price: 6500,
     unit: '/ month',
     category: 'Houses',
@@ -86,7 +86,7 @@ const seedListings: Listing[] = [
     title: 'MacBook Air M1 · 8GB / 256GB',
     price: 52000,
     category: 'Buy & sell',
-    location: 'TUM Main Campus',
+    location: 'Nairobi CBD',
     image: photo('photo-1517336714731-489689fd1ca8'),
     posted: '34 min ago',
     seller: 'Brian M.',
@@ -160,7 +160,7 @@ const seedListings: Listing[] = [
     title: 'Nike Air Force 1 · size 42',
     price: 3800,
     category: 'Buy & sell',
-    location: 'TUM Main Campus',
+    location: 'Eldoret Town',
     image: photo('photo-1542291026-7eec264c27ff'),
     posted: 'Yesterday',
     seller: 'Kevin T.',
@@ -190,7 +190,7 @@ const seedListings: Listing[] = [
     price: 500,
     unit: '/ hour',
     category: 'Services',
-    location: 'TUM Main Campus',
+    location: 'Kisumu',
     image: photo('photo-1434030216411-0b793f4b4173'),
     posted: '2 days ago',
     seller: 'Lilian P.',
@@ -211,6 +211,8 @@ const categoryOptions: { label: Category; icon: typeof ShoppingBag; count: strin
 
 const formatPrice = (amount: number) => `KSh ${amount.toLocaleString('en-KE')}`;
 
+const kenyaLocations = ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret', 'Thika', 'Nyeri', 'Machakos', 'Meru', 'Kakamega', 'Garissa', 'Naivasha'];
+
 function App() {
   const [listings, setListings] = useState<Listing[]>(
     isSupabaseConfigured ? [] : seedListings
@@ -222,7 +224,6 @@ function App() {
   const [favorites, setFavorites] = useState<(number | string)[]>([]);
   const [selected, setSelected] = useState<Listing | null>(null);
 
-  // rest of your existing code...
   const [payment, setPayment] = useState<PaymentFlow>(null);
   const [mpesaPhone, setMpesaPhone] = useState('');
   const [paymentBusy, setPaymentBusy] = useState(false);
@@ -630,7 +631,10 @@ function App() {
         await createListing(user, { title, price, category: categoryValue, location: locationValue, description, phone, imageFile });
         await loadBackend(user);
         setPostOpen(false);
-        notify('Listing submitted for review. It will appear after approval.');
+        setCategory('All');
+        setLocation('Everywhere');
+        setQuery('');
+        notify('Your listing is live across Kenya.');
       } catch (error) {
         notify(error instanceof Error ? error.message : 'Could not submit the listing.');
       }
@@ -675,7 +679,7 @@ function App() {
 
   return (
     <div className="app-shell">
-      <div className="topline"><span className="topline-dot" /> Made for TUM. Right here in Mombasa. <span className="topline-end">GOOD FINDS, CLOSER TO HOME <ArrowRight size={13} /></span></div>
+      <div className="topline"><span className="topline-dot" /> Made for Kenya, wherever you are. <span className="topline-end">LOCAL FINDS, NATIONWIDE <ArrowRight size={13} /></span></div>
       <header className="site-header">
         <a className="brand" href="#top" aria-label="TumMarket home">
           <img src="/favicon.svg" alt="" className="brand-mark" />
@@ -691,39 +695,40 @@ function App() {
             {user ? <BadgeCheck size={17} /> : <Heart size={17} />}
             <span>{user ? profile?.display_name ?? 'Account' : 'Saved'}{!user && favorites.length > 0 && <b>{favorites.length}</b>}</span>
           </button>
-          {accountOpen && user && <div className="account-popover"><b>{profile?.display_name ?? 'TUM student'}</b><span className="account-status">{profile?.is_tum_verified ? 'Verified TUM student' : 'TUM verification pending'}</span>{!profile?.is_tum_verified && <button onClick={() => { setAccountOpen(false); setVerificationOpen(true); }}>Request verification</button>}{profile?.role === 'moderator' && <><span className="account-moderator">Marketplace moderator</span><button onClick={() => { setAccountOpen(false); setModerationOpen(true); }}>Open review queue</button></> }<button onClick={() => void signOut()}>Sign out</button></div>}
+          {accountOpen && user && <div className="account-popover"><b>{profile?.display_name ?? 'Marketplace member'}</b><span className="account-status">{profile?.is_tum_verified ? 'Verified community member' : 'Community verification pending'}</span>{!profile?.is_tum_verified && <button onClick={() => { setAccountOpen(false); setVerificationOpen(true); }}>Request verification</button>}{profile?.role === 'moderator' && <><span className="account-moderator">Marketplace moderator</span><button onClick={() => { setAccountOpen(false); setModerationOpen(true); }}>Open review queue</button></> }<button onClick={() => void signOut()}>Sign out</button></div>}
           <button className="post-button" onClick={() => setPostOpen(true)}><Plus size={17} strokeWidth={2.5} /> Post a listing</button>
         </div>
       </header>
 
       <main id="top" className="main-layout">
         <aside className="sidebar">
-          <div className="campus-tag"><span className="campus-seal">T</span><span><b>TUM community</b><small>Trading around campus</small></span><BadgeCheck size={16} className="seal-check" /></div>
+          <div className="campus-tag"><span className="campus-seal">K</span><span><b>Kenya marketplace</b><small>Local finds, nationwide</small></span><BadgeCheck size={16} className="seal-check" /></div>
           <div className="sidebar-label">YOUR MARKETPLACE</div>
           <nav className="category-nav" aria-label="Marketplace categories">
             <button className={`category-nav-item ${category === 'All' ? 'is-active' : ''}`} onClick={() => setCategory('All')}><span className="nav-icon all-icon"><Sparkles size={17} /></span><span>Everything</span><span className="nav-count">242</span></button>
             {categoryOptions.map(({ label, icon: Icon, count }) => <button key={label} className={`category-nav-item ${category === label ? 'is-active' : ''}`} onClick={() => setCategory(label)}><span className="nav-icon"><Icon size={17} /></span><span>{label}</span><span className="nav-count">{count}</span></button>)}
           </nav>
           <div className="sidebar-rule" />
-          <div className="sidebar-label area-label">POPULAR AREAS <ChevronDown size={13} /></div>
+          <div className="sidebar-label area-label">POPULAR CITIES <ChevronDown size={13} /></div>
           <div className="area-list">
-            {['Tudor', 'Buxton', 'Tononoka', 'Kisauni'].map((area, index) => <button key={area} className={location === area ? 'area-selected' : ''} onClick={() => setLocation(location === area ? 'Everywhere' : area)}><span className="area-dot" />{area}<span className="area-count">{[48, 32, 26, 19][index]}</span></button>)}
+            {['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret'].map((area) => <button key={area} className={location === area ? 'area-selected' : ''} onClick={() => setLocation(location === area ? 'Everywhere' : area)}><span className="area-dot" />{area}</button>)}
           </div>
-          <div className="safety-card"><div className="safety-icon"><ShieldCheck size={19} /></div><b>Keep it campus-safe</b><p>Meet in public. View a room before sending rent.</p><button onClick={() => notify('Never send rent or a deposit before viewing a room in person.')}>Safety tips <ArrowRight size={13} /></button></div>
-          <div className="sidebar-footer"><span>BUILT AROUND THE COAST</span><span>© 2026 TUMMARKET</span></div>
+          <div className="safety-card"><div className="safety-icon"><ShieldCheck size={19} /></div><b>Shop safely across Kenya</b><p>Meet in public. View a room before sending rent.</p><button onClick={() => notify('Never send rent or a deposit before viewing a room in person.')}>Safety tips <ArrowRight size={13} /></button></div>
+          <div className="sidebar-footer"><span>BUILT FOR KENYA</span><span>© 2026 TUMMARKET</span></div>
         </aside>
 
         <section className="market-content">
-          <div className="welcome-row"><div><div className="eyebrow"><span className="live-pulse" /> THE TUM COMMUNITY BOARD</div><h1>Good things find<br className="mobile-break" /> <em>new people.</em></h1><p className="welcome-copy">Your next room, side gig or everyday essential is already nearby.</p></div><div className="community-stamp"><span className="stamp-top">MOMBASA · KENYA</span><span className="stamp-big">Coast<br />to campus.</span><span className="stamp-bottom">A LITTLE CLOSER, EVERY DAY <ArrowRight size={12} /></span></div></div>
+          <div className="welcome-row"><div><div className="eyebrow"><span className="live-pulse" /> THE KENYA COMMUNITY BOARD</div><h1>Good things find<br className="mobile-break" /> <em>new people.</em></h1><p className="welcome-copy">Your next room, side gig or everyday essential is already nearby.</p></div><div className="community-stamp"><span className="stamp-top">KENYA · EVERY COUNTY</span><span className="stamp-big">Across<br />Kenya.</span><span className="stamp-bottom">A LITTLE CLOSER, EVERY DAY <ArrowRight size={12} /></span></div></div>
 
           <div className="category-tiles" aria-label="Browse by category">
             {categoryOptions.map(({ label, icon: Icon }, index) => <button key={label} className={`category-tile tile-${index} ${category === label ? 'tile-active' : ''}`} onClick={() => setCategory(category === label ? 'All' : label)}><span className="tile-icon"><Icon size={18} /></span><span>{label}</span><ArrowRight className="tile-arrow" size={15} /></button>)}
           </div>
 
-          <div className="section-heading"><div><span className="section-kicker">THE NOTICEBOARD</span><h2>{category === 'All' ? 'Around campus' : category}<span className="result-total">{visibleListings.length.toString().padStart(2, '0')}</span></h2></div><div className="sort-control"><ArrowDownUp size={15} /><select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort listings"><option>Recommended</option><option>Price: low to high</option><option>Price: high to low</option></select><ChevronDown size={13} /></div></div>
-          <div className="filter-row"><div className="filter-location"><MapPin size={15} /><span>Showing around</span><select value={location} onChange={(event) => setLocation(event.target.value)} aria-label="Filter by area"><option>Everywhere</option><option>Tudor</option><option>Buxton</option><option>Tononoka</option><option>Kisauni</option><option>TUM Main Campus</option></select><ChevronDown size={13} /></div><button className="filter-button" onClick={() => { setCategory('All'); setLocation('Everywhere'); setQuery(''); setSort('Recommended'); }}><SlidersHorizontal size={15} /> Reset filters</button></div>
+          <div className="section-heading"><div><span className="section-kicker">THE NOTICEBOARD</span><h2>{category === 'All' ? 'Across Kenya' : category}<span className="result-total">{visibleListings.length.toString().padStart(2, '0')}</span></h2></div><div className="sort-control"><ArrowDownUp size={15} /><select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort listings"><option>Recommended</option><option>Price: low to high</option><option>Price: high to low</option></select><ChevronDown size={13} /></div></div>
+          <div className="filter-row"><div className="filter-location"><MapPin size={15} /><span>Showing around</span><input value={location === 'Everywhere' ? '' : location} onChange={(event) => setLocation(event.target.value || 'Everywhere')} list="kenya-filter-locations" placeholder="All Kenya" aria-label="Filter by town or county" /><datalist id="kenya-filter-locations">{kenyaLocations.map((place) => <option key={place} value={place} />)}</datalist><ChevronDown size={13} /></div>
+          <button className="filter-button" onClick={() => { setCategory('All'); setLocation('Everywhere'); setQuery(''); setSort('Recommended'); }}><SlidersHorizontal size={15} /> Reset filters</button></div>
 
-          {loading ? <div className="empty-state loading-state"><div className="empty-icon"><Clock3 size={21} /></div><h3>Loading the campus board</h3><p>Finding the latest listings.</p></div> : visibleListings.length ? <div className="listing-grid">{visibleListings.map((listing, index) => <article key={listing.id} className={`listing-card ${listing.boosted ? 'listing-boosted' : ''}`} style={{ animationDelay: `${Math.min(index * 55, 330)}ms` }}>
+          {loading ? <div className="empty-state loading-state"><div className="empty-icon"><Clock3 size={21} /></div><h3>Loading the Kenya marketplace</h3><p>Finding the latest listings.</p></div> : visibleListings.length ? <div className="listing-grid">{visibleListings.map((listing, index) => <article key={listing.id} className={`listing-card ${listing.boosted ? 'listing-boosted' : ''}`} style={{ animationDelay: `${Math.min(index * 55, 330)}ms` }}>
             <button className="listing-image-button" onClick={() => setSelected(listing)} aria-label={`View ${listing.title}`}><img src={listing.image} alt={listing.title} loading={index > 3 ? 'lazy' : 'eager'} />{listing.boosted && <span className="boosted-label"><Sparkles size={12} /> FEATURED</span>}{listing.status === 'pending' && <span className="pending-label">PENDING REVIEW</span>}<span className={`listing-type type-${listing.category.toLowerCase().replace(/ /g, '-')}`}>{listing.category}</span></button>
             <button className={`favorite-button ${favorites.includes(listing.id) ? 'favorite-active' : ''}`} aria-label={favorites.includes(listing.id) ? 'Remove from saved' : 'Save listing'} onClick={() => toggleFavorite(listing.id)}><Heart size={17} fill={favorites.includes(listing.id) ? 'currentColor' : 'none'} /></button>
             <button className="listing-info" onClick={() => setSelected(listing)}><span className="listing-price">{formatPrice(listing.price)}<small>{listing.unit}</small></span><span className="listing-title">{listing.title}</span><span className="listing-meta"><span><MapPin size={12} />{listing.location}</span><span className="meta-time"><Clock3 size={12} />{listing.posted}</span></span><span className="seller-line"><span className="seller-avatar">{listing.seller.slice(0, 1)}</span>{listing.seller}{listing.verified && <BadgeCheck size={13} className="verified-icon" />}<span className="view-arrow"><ArrowRight size={14} /></span></span></button>
@@ -732,9 +737,9 @@ function App() {
         </section>
       </main>
 
-      <footer className="mobile-nav"><button className="mobile-nav-active" onClick={() => { setCategory('All'); setLocation('Everywhere'); }}><ShoppingBag size={18} /><span>Explore</span></button><button onClick={() => { if (isSupabaseConfigured) user ? setAccountOpen((open) => !open) : setAuthOpen(true); else notify('Sign-in is available after connecting Supabase.'); }}><span className="mobile-user">{user ? (profile?.display_name?.slice(0, 1) ?? 'T') : 'T'}</span><span>Account</span></button><button className="mobile-post" onClick={() => setPostOpen(true)}><Plus size={20} /><span>Post</span></button><button onClick={() => notify('TUM community account sign-in will be added with authentication.')}><span className="mobile-user">T</span><span>Account</span></button></footer>
+      <footer className="mobile-nav"><button className="mobile-nav-active" onClick={() => { setCategory('All'); setLocation('Everywhere'); }}><ShoppingBag size={18} /><span>Explore</span></button><button onClick={() => { if (isSupabaseConfigured) user ? setAccountOpen((open) => !open) : setAuthOpen(true); else notify('Sign-in is available after connecting Supabase.'); }}><span className="mobile-user">{user ? (profile?.display_name?.slice(0, 1) ?? 'T') : 'T'}</span><span>Account</span></button><button className="mobile-post" onClick={() => setPostOpen(true)}><Plus size={20} /><span>Post</span></button><button onClick={() => notify('Sign in to manage your Kenya marketplace account.')}><span className="mobile-user">T</span><span>Account</span></button></footer>
 
-      {selected && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelected(null); }}><section className="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title"><button className="modal-close" onClick={() => setSelected(null)} aria-label="Close listing"><X size={19} /></button><div className="detail-image"><img src={selected.image} alt={selected.title} /><span className="listing-type">{selected.category}</span></div><div className="detail-body"><div className="detail-topline"><span className="detail-area"><MapPin size={14} />{selected.location}</span><span><Clock3 size={13} /> {selected.posted}</span></div><div className="detail-title-row"><div><div className="detail-price">{formatPrice(selected.price)}<small>{selected.unit}</small></div><h2 id="detail-title">{selected.title}</h2></div><button className={`favorite-button detail-fav ${favorites.includes(selected.id) ? 'favorite-active' : ''}`} onClick={() => toggleFavorite(selected.id)} aria-label="Save listing"><Heart size={18} fill={favorites.includes(selected.id) ? 'currentColor' : 'none'} /></button></div><p className="detail-description">{selected.description}</p>{selected.features && <div className="feature-list">{selected.features.map((feature) => <span key={feature}><Check size={13} />{feature}</span>)}</div>}<div className="seller-profile"><span className="seller-avatar seller-avatar-large">{selected.seller.slice(0, 1)}</span><span><b>{selected.seller} {selected.verified && <BadgeCheck size={14} className="verified-icon" />}</b><small>{selected.verified ? 'TUM community member' : 'Community seller'}</small></span><span className="profile-trust"><ShieldCheck size={14} /> Community</span></div><div className="contact-panel">{unlocked.includes(selected.id) ? <><div className="unlocked-number"><Phone size={16} />{selected.phone}</div><a className="contact-primary" href={`https://wa.me/${selected.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer"><MessageCircle size={17} /> Message on WhatsApp</a></> : <><div className="contact-hidden"><span className="hidden-dots">••• ••• ••••</span><span>Seller contact is hidden</span></div><button className="contact-primary" onClick={() => startPayment('contact', selected)}><Phone size={17} /> Reveal contact <b>KSh 20</b></button><span className="demo-caption">Demo preview · no money will be charged</span></>}<button className="boost-inline" onClick={() => startPayment('boost', selected)}><Sparkles size={14} /> Boost this listing <b>KSh 50</b></button></div><button className="report-button" onClick={reportListing}><Flag size={13} /> Report this listing</button>{selected.category === 'Houses' || selected.category === 'Vacancies' ? <div className="house-warning"><ShieldCheck size={16} /><span>Always view the room in person before sending rent or a deposit.</span></div> : null}</div></section></div>}
+      {selected && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelected(null); }}><section className="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title"><button className="modal-close" onClick={() => setSelected(null)} aria-label="Close listing"><X size={19} /></button><div className="detail-image"><img src={selected.image} alt={selected.title} /><span className="listing-type">{selected.category}</span></div><div className="detail-body"><div className="detail-topline"><span className="detail-area"><MapPin size={14} />{selected.location}</span><span><Clock3 size={13} /> {selected.posted}</span></div><div className="detail-title-row"><div><div className="detail-price">{formatPrice(selected.price)}<small>{selected.unit}</small></div><h2 id="detail-title">{selected.title}</h2></div><button className={`favorite-button detail-fav ${favorites.includes(selected.id) ? 'favorite-active' : ''}`} onClick={() => toggleFavorite(selected.id)} aria-label="Save listing"><Heart size={18} fill={favorites.includes(selected.id) ? 'currentColor' : 'none'} /></button></div><p className="detail-description">{selected.description}</p>{selected.features && <div className="feature-list">{selected.features.map((feature) => <span key={feature}><Check size={13} />{feature}</span>)}</div>}<div className="seller-profile"><span className="seller-avatar seller-avatar-large">{selected.seller.slice(0, 1)}</span><span><b>{selected.seller} {selected.verified && <BadgeCheck size={14} className="verified-icon" />}</b><small>{selected.verified ? 'Verified community member' : 'Community seller'}</small></span><span className="profile-trust"><ShieldCheck size={14} /> Community</span></div><div className="contact-panel">{unlocked.includes(selected.id) ? <><div className="unlocked-number"><Phone size={16} />{selected.phone}</div><a className="contact-primary" href={`https://wa.me/${selected.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer"><MessageCircle size={17} /> Message on WhatsApp</a></> : <><div className="contact-hidden"><span className="hidden-dots">••• ••• ••••</span><span>Seller contact is hidden</span></div><button className="contact-primary" onClick={() => startPayment('contact', selected)}><Phone size={17} /> Reveal contact <b>KSh 20</b></button><span className="demo-caption">Demo preview · no money will be charged</span></>}<button className="boost-inline" onClick={() => startPayment('boost', selected)}><Sparkles size={14} /> Boost this listing <b>KSh 50</b></button></div><button className="report-button" onClick={reportListing}><Flag size={13} /> Report this listing</button>{selected.category === 'Houses' || selected.category === 'Vacancies' ? <div className="house-warning"><ShieldCheck size={16} /><span>Always view the room in person before sending rent or a deposit.</span></div> : null}</div></section></div>}
 
       {payment && (
   <div
@@ -771,7 +776,7 @@ function App() {
       </div>
 
       <span className="section-kicker">
-        TUMMARKET CHECKOUT
+        KENYA MARKETPLACE CHECKOUT
       </span>
 
       <h2 id="payment-heading">
@@ -941,7 +946,7 @@ function App() {
   </div>
 )}
 
-      {postOpen && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setPostOpen(false); }}><section className="post-modal" role="dialog" aria-modal="true" aria-labelledby="post-heading"><button className="modal-close" onClick={() => setPostOpen(false)} aria-label="Close form"><X size={19} /></button><span className="section-kicker">TELL THE COMMUNITY</span><h2 id="post-heading">Put it out there.</h2><p className="post-intro">Rooms, good stuff, work, skills. Your people are right here.</p><form className="post-form" onSubmit={handlePost}><label>What are you posting?<input name="title" placeholder="e.g. Sunny bedsitter near campus" required maxLength={80} /></label><div className="form-split"><label>Category<select name="category" required>{categoryOptions.map(({ label }) => <option key={label}>{label}</option>)}</select><ChevronDown size={14} /></label><label>Price (KSh)<input name="price" type="number" min="1" placeholder="6500" required /></label></div><div className="form-split"><label>Area<select name="location"><option>Tudor, Mombasa</option><option>Buxton, Mombasa</option><option>Tononoka</option><option>Kisauni</option><option>TUM Main Campus</option></select><ChevronDown size={14} /></label><label>Your phone<input name="phone" type="tel" placeholder="07xx xxx xxx" required /></label></div><label>Listing photo <span className="optional-label">(JPG, PNG or WebP · max 5 MB)</span><input name="image" type="file" accept="image/jpeg,image/png,image/webp" /></label><label>Details<textarea name="description" rows={3} placeholder="Share the useful details..." required maxLength={400} /></label><div className="post-note"><ShieldCheck size={15} /><span>Meet on campus or in public. Never share sensitive account details.</span></div><button className="post-submit" type="submit"><Plus size={17} /> Publish listing</button><span className="post-demo-caption">{isSupabaseConfigured ? 'New listings are reviewed before appearing publicly.' : 'Demo only · listings are not saved after refresh'}</span></form></section></div>}
+      {postOpen && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setPostOpen(false); }}><section className="post-modal" role="dialog" aria-modal="true" aria-labelledby="post-heading"><button className="modal-close" onClick={() => setPostOpen(false)} aria-label="Close form"><X size={19} /></button><span className="section-kicker">TELL THE COMMUNITY</span><h2 id="post-heading">Put it out there.</h2><p className="post-intro">Rooms, good stuff, work, skills. Your people are right here.</p><form className="post-form" onSubmit={handlePost}><label>What are you posting?<input name="title" placeholder="e.g. Sunny bedsitter near campus" required maxLength={80} /></label><div className="form-split"><label>Category<select name="category" required>{categoryOptions.map(({ label }) => <option key={label}>{label}</option>)}</select><ChevronDown size={14} /></label><label>Price (KSh)<input name="price" type="number" min="1" placeholder="6500" required /></label></div><div className="form-split"><label>Town or county<input name="location" list="kenya-post-locations" placeholder="e.g. Nairobi, Mombasa, Kisumu" required maxLength={80} /><datalist id="kenya-post-locations">{kenyaLocations.map((place) => <option key={place} value={place} />)}</datalist></label><label>Your phone<input name="phone" type="tel" placeholder="07xx xxx xxx" required /></label></div><label>Listing photo <span className="optional-label">(JPG, PNG or WebP · max 5 MB)</span><input name="image" type="file" accept="image/jpeg,image/png,image/webp" /></label><label>Details<textarea name="description" rows={3} placeholder="Share the useful details..." required maxLength={400} /></label><div className="post-note"><ShieldCheck size={15} /><span>Meet on campus or in public. Never share sensitive account details.</span></div><button className="post-submit" type="submit"><Plus size={17} /> Publish listing</button><span className="post-demo-caption">{isSupabaseConfigured ? 'New listings are reviewed before appearing publicly.' : 'Demo listing is visible immediately.'}</span></form></section></div>}
 
       {authOpen && isSupabaseConfigured && <AuthDialog onClose={() => setAuthOpen(false)} />}
       {verificationOpen && user && <VerificationDialog user={user} onClose={() => setVerificationOpen(false)} onSuccess={() => { setVerificationOpen(false); notify('Verification request submitted for moderator review.'); }} />}

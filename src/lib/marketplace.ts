@@ -126,7 +126,7 @@ export async function fetchListings(
         'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=800&q=82',
       posted: timeAgo(listing.created_at),
       seller:
-        profile?.display_name ?? 'TUM student',
+        profile?.display_name ?? 'Marketplace member',
       phone: '',
       description: listing.description,
       verified: Boolean(

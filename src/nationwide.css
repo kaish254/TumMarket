@@ -1,0 +1,20 @@
+.filter-location input {
+  width: 110px;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #4e584f;
+  font-size: 10px;
+}
+
+.filter-location input::placeholder {
+  color: #8b938b;
+}
+
+@media (max-width: 760px) {
+  .filter-location input {
+    width: 76px;
+    font-size: 9px;
+  }
+}
